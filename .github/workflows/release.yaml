@@ -1,0 +1,48 @@
+name: release
+
+on:
+  push:
+    # run only against tags
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - run: git fetch --force --tags
+      - uses: ./.github/actions/setup-build-env
+      # - name: Install Syft
+      #   run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+      # More assembly might be required: Docker logins, GPG, etc. It all depends
+      # on your needs.
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: .github/release-note.toml
+          args: --verbose --current
+        env:
+          OUTPUT: tmp.CHANGELOG.md
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro':
+          distribution: goreleaser
+          version: latest
+          args: release --clean --release-notes tmp.CHANGELOG.md -f .github/.goreleaser.yaml
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
