@@ -35,3 +35,6 @@ And run it with
 ```bash
 kmip-explorer -addr eu-west-rbx.okms.ovh.net:5696 -cert client.crt -key client.key
 ```
+
+# Demo
+[![asciicast](https://asciinema.org/a/CtasVyDZNQqVLwKvL5ej96ftR.svg)](https://asciinema.org/a/CtasVyDZNQqVLwKvL5ej96ftR)
