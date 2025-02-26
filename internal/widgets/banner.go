@@ -15,6 +15,8 @@
 package widgets
 
 import (
+	"fmt"
+
 	"github.com/ovh/kmip-go/kmipclient"
 
 	"github.com/gdamore/tcell/v2"
@@ -45,7 +47,7 @@ type Info struct {
 	*tview.Table
 }
 
-func NewInfo(server, kmipVersion, clientVersion string) *Info {
+func NewInfo(server, kmipVersion, clientVersion, latestVersion string) *Info {
 	infoStyle := tcell.StyleDefault.Bold(true).Foreground(tcell.ColorOrange)
 	info := tview.NewTable().
 		SetCell(0, 0, tview.NewTableCell("Server Name: ").SetStyle(infoStyle)).
@@ -54,6 +56,11 @@ func NewInfo(server, kmipVersion, clientVersion string) *Info {
 		SetCell(1, 1, tview.NewTableCell(clientVersion)).
 		SetCell(2, 0, tview.NewTableCell("KMIP Version: ").SetStyle(infoStyle)).
 		SetCell(2, 1, tview.NewTableCell(kmipVersion))
+
+	if latestVersion != "" && latestVersion != clientVersion {
+		info.GetCell(1, 1).SetText(fmt.Sprintf("%s ⚡️%s", clientVersion, latestVersion)).
+			SetStyle(tcell.StyleDefault.Foreground(tcell.ColorRed).Bold(true))
+	}
 	return &Info{info}
 }
 
@@ -97,8 +104,8 @@ type Banner struct {
 	logo *Logo
 }
 
-func NewBanner(version string) *Banner {
-	info := NewInfo("", "", version)
+func NewBanner(version, latest string) *Banner {
+	info := NewInfo("", "", version, latest)
 	help := NewHelp()
 	logo := NewLogo()
 	banner := tview.NewFlex().SetDirection(tview.FlexColumn).

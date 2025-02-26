@@ -53,7 +53,7 @@ type Explorer struct {
 	client *kmipclient.Client
 }
 
-func NewExplorer(client *kmipclient.Client, version string) *Explorer {
+func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Explorer {
 	ex := &Explorer{
 		client: client,
 	}
@@ -175,7 +175,7 @@ func NewExplorer(client *kmipclient.Client, version string) *Explorer {
 		AddItem(ex.table, 0, 2, false).
 		AddItem(ex.attributes, 0, 0, false)
 
-	banner := widgets.NewBanner(version)
+	banner := widgets.NewBanner(version, latestVersion)
 	banner.SetClientInfo(client)
 
 	ex.tabs = widgets.NewMobTypeTabs().

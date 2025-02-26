@@ -24,11 +24,13 @@ Usage of kmip-explorer:
   -ca string
         Server's CA (optional)
   -cert string
-        Path to the client certificate 
+        Path to the client certificate
   -key string
         Path to the client private key
-  -no-ccv string
+  -no-ccv
         Do not add client correlation value to requests
+  -no-check-update
+        Do not check for update
   -version
         Display version information
 ```
