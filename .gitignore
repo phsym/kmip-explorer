@@ -27,6 +27,7 @@ go.work.sum
 
 # test files
 *.pem
+certs/
 
 # Github action temporary files.
 # Needs to be ignore to avoid goreleaser failure.
