@@ -27,6 +27,8 @@ Usage of kmip-explorer:
         Path to the client certificate 
   -key string
         Path to the client private key
+  -no-ccv string
+        Do not add client correlation value to requests
   -version
         Display version information
 ```

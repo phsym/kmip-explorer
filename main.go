@@ -43,7 +43,7 @@ var (
 	cert  = flag.String("cert", os.Getenv("KMIP_CERT"), "Path to the client certificate")
 	key   = flag.String("key", os.Getenv("KMIP_KEY"), "Path to the client private key")
 	ca    = flag.String("ca", os.Getenv("KMIP_CA"), "Server's CA (optional)")
-	noCcv = flag.String("no-ccv", os.Getenv("KMIP_NO_CCV"), "Do not add client correlation value to requests")
+	noCcv = flag.Bool("no-ccv", false, "Do not add client correlation value to requests")
 	vers  = flag.Bool("version", false, "Display version information")
 )
 
@@ -71,13 +71,15 @@ func main() {
 }
 
 func newClient() *kmipclient.Client {
+	middlewares := []kmipclient.Middleware{}
+	if !*noCcv {
+		middlewares = append(middlewares, kmipclient.CorrelationValueMiddleware(uuid.NewString))
+	}
 	client, err := kmipclient.Dial(
 		*addr,
 		kmipclient.WithRootCAFile(*ca),
 		kmipclient.WithClientCertFiles(*cert, *key),
-		kmipclient.WithMiddlewares(
-			kmipclient.CorrelationValueMiddleware(uuid.NewString),
-		),
+		kmipclient.WithMiddlewares(middlewares...),
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR:", err)
