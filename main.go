@@ -17,6 +17,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
+	"runtime/debug"
 
 	"github.com/ovh/kmip-go/kmipclient"
 	"github.com/phsym/kmip-explorer/internal"
@@ -37,17 +39,21 @@ var (
 )
 
 var (
-	addr = flag.String("addr", os.Getenv("KMIP_ADDR"), "Address and port of the KMIP Server")
-	cert = flag.String("cert", os.Getenv("KMIP_CERT"), "Path to the client certificate")
-	key  = flag.String("key", os.Getenv("KMIP_KEY"), "Path to the client private key")
-	ca   = flag.String("ca", os.Getenv("KMIP_CA"), "Server's CA (optional)")
-	vers = flag.Bool("version", false, "Display version information")
+	addr  = flag.String("addr", os.Getenv("KMIP_ADDR"), "Address and port of the KMIP Server")
+	cert  = flag.String("cert", os.Getenv("KMIP_CERT"), "Path to the client certificate")
+	key   = flag.String("key", os.Getenv("KMIP_KEY"), "Path to the client private key")
+	ca    = flag.String("ca", os.Getenv("KMIP_CA"), "Server's CA (optional)")
+	noCcv = flag.String("no-ccv", os.Getenv("KMIP_NO_CCV"), "Do not add client correlation value to requests")
+	vers  = flag.Bool("version", false, "Display version information")
 )
 
 func main() {
+	if inf, ok := debug.ReadBuildInfo(); ok {
+		version = inf.Main.Version
+	}
 	flag.Parse()
 	if *vers {
-		fmt.Printf("Version: %s\nCommit: %s\nBuild Date: %s\n", version, commit, date)
+		fmt.Printf("Version: %s\nCommit: %s\nBuild Date: %s\nGo Verison: %s\nOS: %s\nArch: %s\n", version, commit, date, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		return
 	}
 	if *addr == "" || *cert == "" || *key == "" {
