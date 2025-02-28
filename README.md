@@ -1,4 +1,6 @@
 # kmip-explorer
+[![build](https://github.com/phsym/kmip-explorer/actions/workflows/test.yaml/badge.svg)](https://github.com/phsym/kmip-explorer/actions/workflows/test.yaml)
+[![license](https://img.shields.io/badge/license-Apache%202.0-red.svg?style=flat)](https://raw.githubusercontent.com/phsym/kmip-explorer/master/LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/phsym/kmip-explorer)](https://goreportcard.com/report/github.com/phsym/kmip-explorer) [![Download Count](https://img.shields.io/github/downloads/phsym/kmip-explorer/total.svg)](https://github.com/phsym/kmip-explorer/releases/latest)
 
 Browse and manage your KMIP objects in your terminal.
 It supports KMIP from v1.0 up to v1.4.

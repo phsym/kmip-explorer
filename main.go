@@ -65,7 +65,7 @@ func main() {
 		latestVersion = checkLatestVersion(version)
 	}
 	if *vers {
-		fmt.Printf("Version: %s\nCommit: %s\nBuild Date: %s\nGo Verison: %s\nOS: %s\nArch: %s\n", version, commit, date, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("Version: %s\nCommit: %s\nBuild Date: %s\nGo Version: %s\nOS: %s\nArch: %s\n", version, commit, date, runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		if latestVersion != "" {
 			fmt.Println("New version available:", latestVersion)
 		}
