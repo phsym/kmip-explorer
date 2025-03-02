@@ -21,6 +21,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"strings"
 
 	"github.com/ovh/kmip-go/kmipclient"
 	"github.com/phsym/kmip-explorer/internal"
@@ -111,7 +112,9 @@ func checkLatestVersion(currentVersion string) string {
 	if currentVersion == "(devel)" {
 		return ""
 	}
-	currentVersion = "v" + currentVersion
+	if !strings.HasPrefix(currentVersion, "v") {
+		currentVersion = "v" + currentVersion
+	}
 	v, err := getLatestVersion()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Fail to check latest version: %s", err.Error())
