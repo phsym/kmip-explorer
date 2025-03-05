@@ -43,12 +43,13 @@ var (
 )
 
 var (
-	addr  = flag.String("addr", os.Getenv("KMIP_ADDR"), "Address and port of the KMIP Server")
-	cert  = flag.String("cert", os.Getenv("KMIP_CERT"), "Path to the client certificate")
-	key   = flag.String("key", os.Getenv("KMIP_KEY"), "Path to the client private key")
-	ca    = flag.String("ca", os.Getenv("KMIP_CA"), "Server's CA (optional)")
-	noCcv = flag.Bool("no-ccv", false, "Do not add client correlation value to requests")
-	vers  = flag.Bool("version", false, "Display version information")
+	addr       = flag.String("addr", os.Getenv("KMIP_ADDR"), "Address and port of the KMIP Server")
+	cert       = flag.String("cert", os.Getenv("KMIP_CERT"), "Path to the client certificate")
+	key        = flag.String("key", os.Getenv("KMIP_KEY"), "Path to the client private key")
+	ca         = flag.String("ca", os.Getenv("KMIP_CA"), "Server's CA (optional)")
+	noCcv      = flag.Bool("no-ccv", false, "Do not add client correlation value to requests")
+	vers       = flag.Bool("version", false, "Display version information")
+	tlsCiphers = flag.String("tls12-ciphers", "", "Coma separated list of tls 1.2 ciphers to allow. Defaults to a list of secured ciphers")
 
 	skipUpdate = flag.Bool("no-check-update", false, "Do not check for update")
 )
@@ -92,11 +93,16 @@ func newClient() *kmipclient.Client {
 	if !*noCcv {
 		middlewares = append(middlewares, kmipclient.CorrelationValueMiddleware(uuid.NewString))
 	}
+	ciphers := []string{}
+	if *tlsCiphers != "" {
+		ciphers = strings.Split(*tlsCiphers, ",")
+	}
 	client, err := kmipclient.Dial(
 		*addr,
 		kmipclient.WithRootCAFile(*ca),
 		kmipclient.WithClientCertFiles(*cert, *key),
 		kmipclient.WithMiddlewares(middlewares...),
+		kmipclient.WithTlsCipherSuiteNames(ciphers...),
 	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR:", err)

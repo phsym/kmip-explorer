@@ -143,7 +143,10 @@ func (wg *CreateKey) done() {
 			panic("Invalid AES key size:" + err.Error())
 		}
 		f = func(c *kmipclient.Client) (kmip.OperationPayload, error) {
-			req := c.Create().AES(size, kmip.Encrypt|kmip.Decrypt|kmip.WrapKey|kmip.UnwrapKey)
+			req := c.Create().AES(
+				size,
+				kmip.CryptographicUsageEncrypt|kmip.CryptographicUsageDecrypt|kmip.CryptographicUsageWrapKey|kmip.CryptographicUsageUnwrapKey,
+			)
 			if name != "" {
 				req = req.WithName(name)
 			}
@@ -156,7 +159,7 @@ func (wg *CreateKey) done() {
 			panic("Invalid rsa modulus size: " + err.Error())
 		}
 		f = func(c *kmipclient.Client) (kmip.OperationPayload, error) {
-			req := c.CreateKeyPair().RSA(size, kmip.Sign, kmip.Verify)
+			req := c.CreateKeyPair().RSA(size, kmip.CryptographicUsageSign, kmip.CryptographicUsageVerify)
 			if name != "" {
 				req = req.PublicKey().WithName(name + "-Public").
 					PrivateKey().WithName(name + "-Private")
@@ -168,16 +171,16 @@ func (wg *CreateKey) done() {
 		var curve kmip.RecommendedCurve
 		switch crv {
 		case "P-256":
-			curve = kmip.P_256
+			curve = kmip.RecommendedCurveP_256
 		case "P-384":
-			curve = kmip.P_384
+			curve = kmip.RecommendedCurveP_384
 		case "P-521":
-			curve = kmip.P_521
+			curve = kmip.RecommendedCurveP_521
 		default:
 			panic("Invalid EC curve " + crv)
 		}
 		f = func(c *kmipclient.Client) (kmip.OperationPayload, error) {
-			req := c.CreateKeyPair().ECDSA(curve, kmip.Sign, kmip.Verify)
+			req := c.CreateKeyPair().ECDSA(curve, kmip.CryptographicUsageSign, kmip.CryptographicUsageVerify)
 			if name != "" {
 				req = req.PublicKey().WithName(name + "-Public").
 					PrivateKey().WithName(name + "-Private")

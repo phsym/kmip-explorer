@@ -22,7 +22,7 @@ Display help with `kmip-explorer -h`
 ```
 Usage of kmip-explorer:
   -addr string
-        Address and port of the KMIP Server
+        Address and port of the KMIP Server (default "eu-west-rbx.okms.ovh.net:5696")
   -ca string
         Server's CA (optional)
   -cert string
@@ -33,6 +33,8 @@ Usage of kmip-explorer:
         Do not add client correlation value to requests
   -no-check-update
         Do not check for update
+  -tls12-ciphers string
+        Coma separated list of tls 1.2 ciphers to allow. Defaults to a list of secured ciphers
   -version
         Display version information
 ```

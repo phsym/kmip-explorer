@@ -147,7 +147,7 @@ func (wg *Register) done() {
 					return nil, fmt.Errorf("Invalid secret value: %w", err)
 				}
 			}
-			req := client.Register().Secret(kmip.Password, secretValue)
+			req := client.Register().Secret(kmip.SecretDataTypePassword, secretValue)
 			if name != "" {
 				req = req.WithName(name)
 			}
@@ -178,7 +178,11 @@ func (wg *Register) done() {
 			if err != nil {
 				return nil, err
 			}
-			req := client.Register().SymmetricKey(kmip.AES, kmip.Encrypt|kmip.Decrypt|kmip.WrapKey|kmip.UnwrapKey, key)
+			req := client.Register().SymmetricKey(
+				kmip.CryptographicAlgorithmAES,
+				kmip.CryptographicUsageEncrypt|kmip.CryptographicUsageDecrypt|kmip.CryptographicUsageWrapKey|kmip.CryptographicUsageUnwrapKey,
+				key,
+			)
 			if name != "" {
 				req = req.WithName(name)
 			}
@@ -187,7 +191,7 @@ func (wg *Register) done() {
 	case "Private Key":
 		pemValue := wg.form.GetFormItemByLabel("PEM Key").(*tview.TextArea).GetText()
 		f = func(client *kmipclient.Client) (*payloads.RegisterResponsePayload, error) {
-			req := client.Register().PemPrivateKey([]byte(pemValue), kmip.Sign)
+			req := client.Register().PemPrivateKey([]byte(pemValue), kmip.CryptographicUsageSign)
 			if name != "" {
 				req = req.WithName(name)
 			}
@@ -196,7 +200,7 @@ func (wg *Register) done() {
 	case "Public Key":
 		pemValue := wg.form.GetFormItemByLabel("PEM Key").(*tview.TextArea).GetText()
 		f = func(client *kmipclient.Client) (*payloads.RegisterResponsePayload, error) {
-			req := client.Register().PemPublicKey([]byte(pemValue), kmip.Verify)
+			req := client.Register().PemPublicKey([]byte(pemValue), kmip.CryptographicUsageVerify)
 			if name != "" {
 				req = req.WithName(name)
 			}
