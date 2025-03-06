@@ -51,3 +51,9 @@ kmip-explorer -addr eu-west-rbx.okms.ovh.net:5696 -cert client.crt -key client.k
 This project is developed using using [OVHcloud's KMIP client](https://github.com/ovh/kmip-go) and inherits the library compatibility. Checkout the [compatibility matrix](https://github.com/ovh/kmip-go/blob/main/README.md#implementation-status).
 
 It supports KMIP protocol from v1.0 up to v1.4, and is tested against [OVHcloud's KMS service](https://help.ovhcloud.com/csm/en-ie-kms-quick-start?id=kb_article_view&sysparm_article=KB0063362).
+
+### PyKMIP
+Running **kmip-explorer** with a PyKMIP server with default settings may require you to pass the 2 following arguments:
+```bash
+kmip-explorer -tls12-ciphers TLS_RSA_WITH_AES_128_CBC_SHA256 -no-ccv
+```
