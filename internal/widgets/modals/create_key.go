@@ -159,7 +159,7 @@ func (wg *CreateKey) done() {
 			panic("Invalid rsa modulus size: " + err.Error())
 		}
 		f = func(c *kmipclient.Client) (kmip.OperationPayload, error) {
-			req := c.CreateKeyPair().RSA(size, kmip.CryptographicUsageSign, kmip.CryptographicUsageVerify)
+			req := c.CreateKeyPair().RSA(size, kmip.CryptographicUsageSign|kmip.CryptographicUsageDecrypt, kmip.CryptographicUsageVerify|kmip.CryptographicUsageEncrypt)
 			if name != "" {
 				req = req.PublicKey().WithName(name + "-Public").
 					PrivateKey().WithName(name + "-Private")
