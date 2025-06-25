@@ -136,7 +136,7 @@ func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Expl
 			})
 			return nil
 		} else if event.Key() == tcell.KeyCtrlT {
-			ex.rekeyModal.OnDone(func(f func(*kmipclient.Client, string) (*payloads.RekeyResponsePayload, error)) {
+			ex.rekeyModal.OnDone(func(f func(*kmipclient.Client, string) (any, error)) {
 				ex.pages.HidePage("rekey")
 				ex.app.SetFocus(ex.table)
 				ex.askConfirm("Confirm Rekeying", fmt.Sprintf("Rekey object %s ?", obj.UniqueIdentifier), func() {

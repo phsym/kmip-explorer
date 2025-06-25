@@ -15,13 +15,16 @@
 package modals
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/phsym/kmip-explorer/internal/components"
 
+	"github.com/ovh/kmip-go"
 	"github.com/ovh/kmip-go/kmipclient"
-	"github.com/ovh/kmip-go/payloads"
+	"github.com/ovh/kmip-go/ttlv"
 
 	"github.com/rivo/tview"
 )
@@ -30,7 +33,7 @@ type Rekey struct {
 	*tview.Flex
 	form     *components.Form
 	onCancel func()
-	onDone   func(func(*kmipclient.Client, string) (*payloads.RekeyResponsePayload, error))
+	onDone   func(func(*kmipclient.Client, string) (any, error))
 }
 
 func NewRekey() *Rekey {
@@ -65,7 +68,7 @@ func (md *Rekey) OnCancel(cb func()) *Rekey {
 	return md
 }
 
-func (md *Rekey) OnDone(cb func(func(*kmipclient.Client, string) (*payloads.RekeyResponsePayload, error))) *Rekey {
+func (md *Rekey) OnDone(cb func(func(*kmipclient.Client, string) (any, error))) *Rekey {
 	md.onDone = cb
 	return md
 }
@@ -91,12 +94,38 @@ func (md *Rekey) done() {
 		offset = time.Duration(i) * time.Hour * 24
 	}
 
-	md.onDone(func(c *kmipclient.Client, id string) (*payloads.RekeyResponsePayload, error) {
-		req := c.Rekey(id)
-		if offset >= 0 {
-			req = req.WithOffset(offset)
+	md.onDone(func(c *kmipclient.Client, id string) (any, error) {
+		attrs, err := c.GetAttributes(id, kmip.AttributeNameObjectType).Exec()
+		if err != nil {
+			return nil, err
 		}
-		return req.Exec()
+		var oType kmip.ObjectType
+		for _, attr := range attrs.Attribute {
+			if attr.AttributeName == kmip.AttributeNameObjectType {
+				oType = attr.AttributeValue.(kmip.ObjectType)
+			}
+		}
+		if oType == 0 {
+			return nil, errors.New("Undefined KMIP object type")
+		}
+		switch oType {
+		case kmip.ObjectTypeSymmetricKey:
+			req := c.Rekey(id)
+			if offset >= 0 {
+				req = req.WithOffset(offset)
+			}
+			return req.Exec()
+		case kmip.ObjectTypePrivateKey:
+			req := c.RekeyKeyPair(id)
+			if offset >= 0 {
+				req = req.WithOffset(offset)
+			}
+			return req.Exec()
+		case kmip.ObjectTypePublicKey:
+			return nil, errors.New("Cannot rekey a public-key. Please rekey the private-key instead.")
+		default:
+			return nil, fmt.Errorf("Cannot rekey an object of type %s", ttlv.EnumStr(oType))
+		}
 	})
 }
 

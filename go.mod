@@ -8,7 +8,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/ovh/kmip-go v0.4.0
-	github.com/rivo/tview v0.0.0-20250330220935-949945f8d922
+	github.com/rivo/tview v0.0.0-20250501113434-0c592cd31026
 	golang.org/x/mod v0.25.0
 )
 
