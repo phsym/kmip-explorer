@@ -14,7 +14,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-build-env
       - name: Unit Test
         run: go test -race -v ./...
@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-build-env
       - name: Build
         run: go build -v -ldflags="-s -w" -trimpath -o build/ .
@@ -30,7 +30,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/actions/setup-build-env
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
