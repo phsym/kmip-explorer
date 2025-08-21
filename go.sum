@@ -15,8 +15,8 @@ github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69
 github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-runewidth v0.0.16 h1:E5ScNMtiwvlvB5paMFdw9p4kSQzbXFikJ5SQO6TULQc=
 github.com/mattn/go-runewidth v0.0.16/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
-github.com/ovh/kmip-go v0.5.0 h1:VQdgdzBEk1GC2d89dvtdIpyKF0mbGNrm2iDftY2JYv0=
-github.com/ovh/kmip-go v0.5.0/go.mod h1:ATNCndyULLBcEt7jp4j8cR4ko4gnH37KBA9ZPeNUuKk=
+github.com/ovh/kmip-go v0.6.0 h1:q1rqGMCS69j4O80BGjxJ/wc/JoyQDlpEBKBFbG8ciQw=
+github.com/ovh/kmip-go v0.6.0/go.mod h1:ATNCndyULLBcEt7jp4j8cR4ko4gnH37KBA9ZPeNUuKk=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rivo/tview v0.0.0-20250501113434-0c592cd31026 h1:ij8h8B3psk3LdMlqkfPTKIzeGzTaZLOiyplILMlxPAM=
