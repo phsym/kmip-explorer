@@ -87,6 +87,7 @@ func (md *Revoke) done() {
 
 	md.onDone(func(c *kmipclient.Client, id string) (*payloads.RevokeResponsePayload, error) {
 		return c.Revoke(id).
+			//nolint: gosec // there's no reason for reasonCode+1 to overflow int32
 			WithRevocationReasonCode(kmip.RevocationReasonCode(reasonCode + 1)).
 			WithRevocationMessage(msg).
 			Exec()

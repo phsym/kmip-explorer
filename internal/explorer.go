@@ -395,7 +395,6 @@ func (ex *Explorer) update(id string) {
 	ex.app.QueueUpdateDraw(func() {
 		ex.table.UpdateObject(attrs)
 	})
-
 }
 
 func (ex *Explorer) askConfirm(title, question string, f func()) {

@@ -172,7 +172,6 @@ func (wg *Register) done() {
 				decode = hex.DecodeString
 			case "Base 64":
 				decode = base64.StdEncoding.DecodeString
-
 			}
 			key, err := decode(data)
 			if err != nil {

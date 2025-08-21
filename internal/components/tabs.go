@@ -67,7 +67,7 @@ func (t *Tabs) Select(tab int) {
 	if tab < 0 {
 		tab = len(t.choices) - 1
 	} else {
-		tab = tab % len(t.choices)
+		tab %= len(t.choices)
 	}
 	if tab == t.selected {
 		return
