@@ -9,7 +9,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/ovh/kmip-go v0.7.1
 	github.com/rivo/tview v0.42.0
-	golang.org/x/mod v0.29.0
+	golang.org/x/mod v0.30.0
 )
 
 require (
@@ -18,5 +18,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/term v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
 )
