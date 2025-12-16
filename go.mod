@@ -7,7 +7,7 @@ require (
 	github.com/gdamore/tcell/v2 v2.13.4
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
-	github.com/ovh/kmip-go v0.7.1
+	github.com/ovh/kmip-go v0.7.2
 	github.com/rivo/tview v0.42.0
 	golang.org/x/mod v0.31.0
 )
