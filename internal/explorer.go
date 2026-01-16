@@ -307,6 +307,11 @@ func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Expl
 		if event.Key() == tcell.KeyCtrlR {
 			//TODO: Move to table input handler ?
 			go ex.refresh(false)
+			return nil
+		}
+		if event.Key() == tcell.KeyCtrlC {
+			// Suppress Ctrl+C to avoid exiting the app
+			return tcell.NewEventKey(tcell.KeyCtrlC, 0, tcell.ModNone)
 		}
 		return event
 	})
