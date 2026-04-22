@@ -1,6 +1,6 @@
 module github.com/phsym/kmip-explorer
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/atotto/clipboard v0.1.4
