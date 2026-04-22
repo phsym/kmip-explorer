@@ -5,7 +5,7 @@ name: test
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   workflow_call: {}
 
 permissions: {}
@@ -35,5 +35,4 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.4
-
+          version: v2.11
