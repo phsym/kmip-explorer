@@ -29,6 +29,21 @@ import (
 	"github.com/rivo/tview"
 )
 
+// Regexes used to reshape the text-encoded attribute value into the colorized
+// form shown in the attributes panel. Compiled once at package init since
+// rebuildAttributes runs on every selection change and lazy-load completion.
+var (
+	attributeValueHdrRegex    = regexp.MustCompile(`^AttributeValue \(.+\): `)
+	attributeValueFieldsRegex = regexp.MustCompile(`(.+) \(.+\): `)
+)
+
+// Proportional heights of the attributes panel within the content flex.
+const (
+	attrPanelHidden   = 0 // no selection: collapsed
+	attrPanelPreview  = 1 // selected but unfocused: small preview beside the table
+	attrPanelExpanded = 6 // focused: the user dived into the attributes
+)
+
 type Explorer struct {
 	app        *tview.Application
 	search     *tview.InputField
@@ -72,11 +87,14 @@ func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Expl
 	ex.attributes = tview.NewTextView().SetDynamicColors(true)
 	ex.attributes.SetBorder(true).SetTitle("Attributes")
 
-	ex.table = widgets.NewMobTable().
+	loader := func(id string) (*payloads.GetAttributesResponsePayload, error) {
+		return ex.client.GetAttributes(id).Exec()
+	}
+	ex.table = widgets.NewMobTable(loader, ex.app).
 		OnSelected(func(garp *payloads.GetAttributesResponsePayload) {
 			if garp != nil {
 				ex.app.SetFocus(ex.attributes)
-				ex.contentLayout.ResizeItem(ex.attributes, 0, 6)
+				ex.contentLayout.ResizeItem(ex.attributes, 0, attrPanelExpanded)
 			}
 		}).
 		OnSelectionChanged(func(garp *payloads.GetAttributesResponsePayload) {
@@ -173,7 +191,7 @@ func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Expl
 
 	content := tview.NewFlex().
 		AddItem(ex.table, 0, 2, false).
-		AddItem(ex.attributes, 0, 0, false)
+		AddItem(ex.attributes, 0, attrPanelHidden, false)
 
 	banner := widgets.NewBanner(version, latestVersion)
 	banner.SetClientInfo(client)
@@ -293,7 +311,7 @@ func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Expl
 				//TODO: Move this handler to the attributes input handler
 				ex.attributes.ScrollToBeginning()
 				ex.app.SetFocus(ex.table)
-				ex.contentLayout.ResizeItem(ex.attributes, 0, 1)
+				ex.contentLayout.ResizeItem(ex.attributes, 0, attrPanelPreview)
 				return nil
 			}
 		}
@@ -339,29 +357,44 @@ func (ex *Explorer) setError(err error) {
 
 func (ex *Explorer) rebuildAttributes(garp *payloads.GetAttributesResponsePayload) {
 	ex.attributes.Clear()
-	if garp != nil {
-		enc := ttlv.NewTextEncoder()
-		strBld := strings.Builder{}
-		//FIXME: init the regex in a static var
-		attributeValueHdrRegex := regexp.MustCompile(`^AttributeValue \(.+\): `)
-		attributeValueFieldsRegex := regexp.MustCompile(`(.+) \(.+\): `)
-		for _, attr := range garp.Attribute {
-			strBld.WriteString("[green]")
-			strBld.WriteString(string(attr.AttributeName))
-			strBld.WriteString(": [white]")
-			enc.TagAny(kmip.TagAttributeValue, attr.AttributeValue)
-			//XXX: It's a bit dirty but it works well for now. The regex could conflict with some values still. We need to find a better way
-			value := attributeValueHdrRegex.ReplaceAll(enc.Bytes(), nil)
-			value = attributeValueFieldsRegex.ReplaceAll(value, []byte("[yellow]$1: [white]"))
-			strBld.Write(value)
-			strBld.WriteByte('\n')
-			enc.Clear()
-		}
-		ex.attributes.SetText(strBld.String())
-		ex.contentLayout.ResizeItem(ex.attributes, 0, 1)
-	} else {
-		ex.contentLayout.ResizeItem(ex.attributes, 0, 0)
+	if garp == nil {
+		ex.contentLayout.ResizeItem(ex.attributes, 0, attrPanelHidden)
+		return
 	}
+	// When the panel is focused the user has expanded it, so a content refresh
+	// (e.g. a lazy load completing while the panel shows "Loading…") must keep it
+	// at the expanded height rather than shrinking it back to preview.
+	openSize := attrPanelPreview
+	if ex.attributes.HasFocus() {
+		openSize = attrPanelExpanded
+	}
+	ex.contentLayout.ResizeItem(ex.attributes, 0, openSize)
+	if len(garp.Attribute) == 0 {
+		// A stub for a selected row whose details aren't cached: either the fetch
+		// is still in flight, or it failed — in which case show why rather than a
+		// perpetual "Loading…".
+		if err := ex.table.SelectionError(); err != nil {
+			ex.attributes.SetText("[red]Failed to load attributes:[-]\n" + tview.Escape(err.Error()))
+		} else {
+			ex.attributes.SetText("[gray]Loading…")
+		}
+		return
+	}
+	enc := ttlv.NewTextEncoder()
+	strBld := strings.Builder{}
+	for _, attr := range garp.Attribute {
+		strBld.WriteString("[green]")
+		strBld.WriteString(string(attr.AttributeName))
+		strBld.WriteString(": [white]")
+		enc.TagAny(kmip.TagAttributeValue, attr.AttributeValue)
+		//XXX: It's a bit dirty but it works well for now. The regex could conflict with some values still. We need to find a better way
+		value := attributeValueHdrRegex.ReplaceAll(enc.Bytes(), nil)
+		value = attributeValueFieldsRegex.ReplaceAll(value, []byte("[yellow]$1: [white]"))
+		strBld.Write(value)
+		strBld.WriteByte('\n')
+		enc.Clear()
+	}
+	ex.attributes.SetText(strBld.String())
 }
 
 func (ex *Explorer) refresh(resetSelect bool) {
@@ -374,20 +407,12 @@ func (ex *Explorer) refresh(resetSelect bool) {
 		ex.setError(err)
 		return
 	}
-	attrs := make([]*payloads.GetAttributesResponsePayload, len(resp.UniqueIdentifier))
-	for i, obj := range resp.UniqueIdentifier {
-		attrs[i], err = ex.client.GetAttributes(obj).Exec()
-		if err != nil {
-			ex.setError(err)
-			return
-		}
-	}
 	ex.app.QueueUpdateDraw(func() {
 		if resetSelect {
 			ex.table.ScrollToBeginning()
 			ex.table.Select(0, 0)
 		}
-		ex.table.SetObjects(attrs)
+		ex.table.SetIDs(resp.UniqueIdentifier)
 	})
 }
 
