@@ -15,7 +15,7 @@ builds:
     # main: .
     id: "kmip-explorer"
     binary: kmip-explorer
-    dir: ./
+    dir: ./cmd/kmip-explorer
 
 archives:
   - format: tar.gz
