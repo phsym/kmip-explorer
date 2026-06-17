@@ -52,13 +52,15 @@ func NewInfo(server, kmipVersion, clientVersion, latestVersion string) *Info {
 	info := tview.NewTable().
 		SetCell(0, 0, tview.NewTableCell("Server Name: ").SetStyle(infoStyle)).
 		SetCell(0, 1, tview.NewTableCell(server)).
-		SetCell(1, 0, tview.NewTableCell("Client Version: ").SetStyle(infoStyle)).
-		SetCell(1, 1, tview.NewTableCell(clientVersion)).
-		SetCell(2, 0, tview.NewTableCell("KMIP Version: ").SetStyle(infoStyle)).
-		SetCell(2, 1, tview.NewTableCell(kmipVersion))
+		SetCell(1, 0, tview.NewTableCell("KMIP Version: ").SetStyle(infoStyle)).
+		SetCell(1, 1, tview.NewTableCell(kmipVersion))
+	if clientVersion != "" {
+		info.SetCell(2, 0, tview.NewTableCell("Client Version: ").SetStyle(infoStyle))
+		info.SetCell(2, 1, tview.NewTableCell(clientVersion))
+	}
 
-	if latestVersion != "" && latestVersion != clientVersion {
-		info.GetCell(1, 1).SetText(fmt.Sprintf("%s ⚡️%s", clientVersion, latestVersion)).
+	if clientVersion != "" && latestVersion != "" && latestVersion != clientVersion {
+		info.GetCell(2, 1).SetText(fmt.Sprintf("%s ⚡️%s", clientVersion, latestVersion)).
 			SetStyle(tcell.StyleDefault.Foreground(tcell.ColorRed).Bold(true))
 	}
 	return &Info{info}
