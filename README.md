@@ -15,7 +15,47 @@ It supports KMIP from v1.0 up to v1.4.
 Download the latest release from the [release page](https://github.com/phsym/kmip-explorer/releases/latest)
 
 #### Install with go
-Run `go install github.com/phsym/kmip-explorer@latest`
+Run `go install github.com/phsym/kmip-explorer/cmd/kmip-explorer@latest`
+
+## Use as a library
+
+The terminal UI can be embedded into your own application. The root package
+exposes a minimal API by design: you build and own a `kmipclient.Client`
+(controlling TLS, middlewares and the server address yourself), hand it to
+`explorer.New`, then call `Run` to start the UI.
+
+```go
+package main
+
+import (
+	"log"
+
+	"github.com/ovh/kmip-go/kmipclient"
+	explorer "github.com/phsym/kmip-explorer"
+)
+
+func main() {
+	client, err := kmipclient.Dial(
+		"eu-west-rbx.okms.ovh.net:5696",
+		kmipclient.WithClientCertFiles("cert.pem", "key.pem"),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// version is shown in the banner; pass "" as latestVersion to disable the
+	// update hint.
+	exp := explorer.New(client, "dev", "")
+	if err := exp.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+`Run` takes over the terminal and blocks until the user quits. See the
+[package documentation](https://pkg.go.dev/github.com/phsym/kmip-explorer) for
+details.
 
 ### Run it
 Display help with `kmip-explorer -h`

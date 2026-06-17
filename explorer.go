@@ -12,7 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internal
+// Package explorer provides a terminal UI for browsing and managing KMIP
+// objects over a [kmipclient.Client] connection.
+//
+// It is primarily consumed by the kmip-explorer command, but the TUI can also
+// be embedded into another application: construct an [Explorer] with [New] and
+// drive it with [Explorer.Run]. The public surface is intentionally minimal —
+// the caller owns the KMIP client (TLS, middlewares, server address) and hands
+// it to the explorer ready to use.
+//
+//	client, err := kmipclient.Dial(addr, opts...)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	defer client.Close()
+//	if err := explorer.New(client, version, "").Run(); err != nil {
+//		log.Fatal(err)
+//	}
+package explorer
 
 import (
 	"fmt"
@@ -44,6 +61,9 @@ const (
 	attrPanelExpanded = 6 // focused: the user dived into the attributes
 )
 
+// Explorer is the KMIP browser terminal application. Create one with [New] and
+// start it with [Explorer.Run]. An Explorer is single-use and not safe for
+// concurrent use by multiple goroutines.
 type Explorer struct {
 	app        *tview.Application
 	search     *tview.InputField
@@ -68,7 +88,15 @@ type Explorer struct {
 	client *kmipclient.Client
 }
 
-func NewExplorer(client *kmipclient.Client, version, latestVersion string) *Explorer {
+// New builds an Explorer that operates against the given KMIP client. The
+// client must be connected and ready to use; the Explorer does not close it.
+//
+// version is the application version displayed in the banner; pass an empty
+// string to hide the version line entirely. latestVersion is the newest
+// version available upstream, used to show an update hint next to the version;
+// pass an empty string to disable the hint (it is also suppressed when version
+// is empty). The returned Explorer is started with [Explorer.Run].
+func New(client *kmipclient.Client, version, latestVersion string) *Explorer {
 	ex := &Explorer{
 		client: client,
 	}
@@ -341,6 +369,10 @@ func (ex *Explorer) init() {
 	go ex.refresh(true)
 }
 
+// Run takes over the terminal, draws the UI and blocks until the user quits
+// (by pressing 'q') or a fatal error occurs. It returns any error reported by
+// the underlying terminal application. Run must be called at most once per
+// Explorer.
 func (ex *Explorer) Run() error {
 	ex.init()
 	defer ex.app.Stop()

@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/ovh/kmip-go/kmipclient"
-	"github.com/phsym/kmip-explorer/internal"
+	explorer "github.com/phsym/kmip-explorer"
 	"golang.org/x/mod/semver"
 
 	"flag"
@@ -81,7 +81,7 @@ func main() {
 
 	// tview.Styles.PrimitiveBackgroundColor = tcell.ColorNone
 	client := newClient()
-	exp := internal.NewExplorer(client, version, latestVersion)
+	exp := explorer.New(client, version, latestVersion)
 	if err := exp.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR:", err)
 		os.Exit(1)
