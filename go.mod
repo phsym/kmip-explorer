@@ -9,7 +9,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/ovh/kmip-go v0.9.1
 	github.com/rivo/tview v0.42.0
-	golang.org/x/mod v0.38.0
+	golang.org/x/mod v0.41.0
 )
 
 require (
